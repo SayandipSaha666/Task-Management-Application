@@ -1,0 +1,39 @@
+npx shadcn@latest init
+jsconfig.json
+{
+  "files": [],
+  "references": [
+    {
+      "path": "./tsconfig.app.json"
+    },
+    {
+      "path": "./tsconfig.node.json"
+    }
+  ],
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@/*": [
+        "./src/*"
+      ]
+    }
+  }
+}
+
+npm i react-hook-form @hookform/resolvers @hookform/error-message react-router-dom
+npm install -D @babel/preset-env @babel/preset-react jest @testing-library/react @testing-library/jest-dom jest-environment-jsdom @testing-library/user-event
+package.json -> scripts "test": "jest"
+also create 
+.babelrc 
+    {
+        "presets": [
+            "@babel/preset-env",
+            ["@babel/preset-react", {"runtime" : "automatic"}]
+        ]
+    }
+
+jest.config.js
+    module.exports = {
+    testEnvironment: "jsdom",
+    };
+
