@@ -8,7 +8,7 @@ function CommonForm({formControls=[],handleSubmit,submitButtonText,form}) {
   return (
     <>
     <Form {...form}> 
-        <form onSubmit={form.handleSubmit(handleSubmit)}>
+        <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-5">
             {Array.isArray(formControls) && formControls?.length > 0 ? 
             formControls.map((controlItem) => (
                 <FormField
@@ -18,7 +18,7 @@ function CommonForm({formControls=[],handleSubmit,submitButtonText,form}) {
                     render = { ({field}) => {
                             return (
                                 <FormItem>
-                                    <FormLabel>{controlItem.label}</FormLabel>
+                                    <FormLabel className="text-sm font-medium text-foreground/80">{controlItem.label}</FormLabel>
                                     { controlItem.componentType === "input" ?
                                             <FormControl>
                                                 <Input
@@ -30,7 +30,7 @@ function CommonForm({formControls=[],handleSubmit,submitButtonText,form}) {
                                                     onChange={field.onChange}
                                                     required={controlItem.required}
                                                     disabled={controlItem.disabled}
-                                                    className="w-full rounded h-12.5 border-none text-black bg-gray-200 text-[16px] outline-none drop-shadow-sm transition-all duration-300 ease-in-out focus:bg-gray-100 focus:drop-shadow-lg focus-visible:outline-none focus-visible:ring-0 focus-visible:ring-offset-0"
+                                                    className="w-full h-11 rounded-xl border border-border/80 bg-muted/30 px-4 text-sm text-foreground placeholder:text-muted-foreground/60 transition-all duration-200 focus:border-indigo-400 focus:bg-white focus:ring-2 focus:ring-indigo-500/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500/20"
                                                 />
                                             </FormControl>
                                         : controlItem.componentType === "select" ? (
@@ -39,19 +39,19 @@ function CommonForm({formControls=[],handleSubmit,submitButtonText,form}) {
                                             onValueChange={field.onChange}
                                             >
                                             <FormControl>
-                                                <SelectTrigger className="w-full rounded h-12.5 border-none text-black bg-gray-200 text-[16px] outline-none drop-shadow-sm transition-all duration-300 ease-in-out focus:bg-gray-100 focus:drop-shadow-lg focus-visible:outline-none focus-visible:ring-0 focus-visible:ring-offset-0">
+                                                <SelectTrigger className="w-full h-11 rounded-xl border border-border/80 bg-muted/30 px-4 text-sm text-foreground transition-all duration-200 focus:border-indigo-400 focus:bg-white focus:ring-2 focus:ring-indigo-500/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500/20">
                                                     <SelectValue
-                                                    className="text-black focus:text-black"
+                                                    className="text-foreground"
                                                     placeholder={controlItem.placeholder || "Select"}
                                                     />
                                                 </SelectTrigger>
                                             </FormControl>
-                                            <SelectContent className="bg-white">
+                                            <SelectContent className="rounded-xl border border-border/60 bg-white/95 shadow-xl backdrop-blur-xl">
                                                 {controlItem.options?.map((optionItem) => (
                                                 <SelectItem
                                                     key={optionItem.id}
                                                     value={String(optionItem.id)}
-                                                    className="text-black cursor-pointer focus:text-black"
+                                                    className="text-sm text-foreground cursor-pointer rounded-lg transition-colors focus:bg-indigo-50 focus:text-indigo-700"
                                                 >
                                                     {optionItem.label}
                                                 </SelectItem>
@@ -69,7 +69,7 @@ function CommonForm({formControls=[],handleSubmit,submitButtonText,form}) {
             ))
             : null
             }
-            <div className="flex justify-center mt-4 items-center">
+            <div className="flex justify-end pt-2">
                 <CommonButton 
                     type={"submit"}
                     buttonText={submitButtonText}

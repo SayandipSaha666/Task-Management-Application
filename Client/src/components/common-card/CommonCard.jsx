@@ -14,14 +14,15 @@ function CommonCard({
   footerContent,
   content,
   headerRightContent,
+  className,
 }) {
   return (
-    <Card className="flex bg-gray-100 flex-col gap-6 rounded-2xl p-8 transition duration-300 hover:bg-white hover:shadow-2xl hover:shadow-gray-600/10 cursor-pointer">
+    <Card className={`group flex flex-col gap-4 rounded-2xl border border-border/60 bg-white/80 p-6 shadow-sm shadow-slate-900/[0.03] backdrop-blur-sm transition-all duration-300 hover:shadow-md hover:shadow-slate-900/[0.06] hover:-translate-y-0.5 hover:border-indigo-200/50 ${className || ''}`}>
       <CardHeader className="p-0">
-        <div className="flex justify-between">
+        <div className="flex items-start justify-between gap-3">
           {title ? (
             <CardTitle
-              className={`text-2xl max-w-62.5 text-ellipsis overflow-hidden whitespace-nowrap font-semibold text-gray-950 ${
+              className={`text-base font-semibold leading-snug text-foreground max-w-[220px] truncate ${
                 extraTextStyles ? extraTextStyles : ""
               }`}
             >
@@ -30,16 +31,14 @@ function CommonCard({
           ) : null}
           {headerRightContent ? headerRightContent : null}
         </div>
-        <div className="flex justify-start">
-          {description ? (
-            <CardDescription className="mt-3 text-gray-600">
-              {description}
-            </CardDescription>
-          ) : null}
-        </div>
+        {description ? (
+          <CardDescription className="mt-1.5 text-sm text-muted-foreground leading-relaxed">
+            {description}
+          </CardDescription>
+        ) : null}
       </CardHeader>
       {content ? <CardContent className="p-0">{content}</CardContent> : null}
-      <CardFooter className="p-0">{footerContent}</CardFooter>
+      {footerContent ? <CardFooter className="p-0 pt-2 border-t border-border/40">{footerContent}</CardFooter> : null}
     </Card>
   );
 }

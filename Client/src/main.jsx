@@ -10,7 +10,7 @@ createRoot(document.getElementById('root')).render(
   <BrowserRouter>
     <GlobalState>
       <App />
-      <Toaster/>
+      <Toaster richColors position="top-right" />
     </GlobalState>
   </BrowserRouter>,
 )
