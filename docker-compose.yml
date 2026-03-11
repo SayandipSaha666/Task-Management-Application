@@ -1,0 +1,176 @@
+services:
+  # ─── Infrastructure ───────────────────────────────────────
+  
+  rabbitmq:
+    image: rabbitmq:3-management     # Includes the web management UI
+    container_name: rabbitmq
+    ports:
+      - "5672:5672"                   # AMQP protocol port
+      - "15672:15672"                 # Management dashboard
+    environment:
+      RABBITMQ_DEFAULT_USER: admin
+      RABBITMQ_DEFAULT_PASS: password
+    volumes:
+      - rabbitmq-data:/var/lib/rabbitmq
+    networks:
+      - app-network
+    healthcheck:
+      test: rabbitmq-diagnostics -q ping
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  mongo-user:
+    image: mongo:7
+    container_name: mongo-user
+    volumes:
+      - mongo-user-data:/data/db
+    networks:
+      - app-network
+    # NOT exposed to host — only reachable inside Docker network
+
+  mongo-task:
+    image: mongo:7
+    container_name: mongo-task
+    volumes:
+      - mongo-task-data:/data/db
+    networks:
+      - app-network
+
+  mongo-notification:
+    image: mongo:7
+    container_name: mongo-notification
+    volumes:
+      - mongo-notif-data:/data/db
+    networks:
+      - app-network
+
+  # ─── Services ──────────────
+  
+  # user-service: 
+  user-service:
+    build:
+      context: ./services/user-service
+      dockerfile: Dockerfile
+    container_name: user-service
+    ports:
+      - "4001:4001"       # Exposed for testing (remove after Gateway is built)
+    environment:
+      PORT: 4001
+      MONGO_URI: mongodb://mongo-user:27017/user_db
+      SECRET_KEY: ${SECRET_KEY}
+      RABBITMQ_URL: amqp://admin:password@rabbitmq:5672
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+      mongo-user:
+        condition: service_started
+    networks:
+      - app-network
+    restart: unless-stopped
+    develop:
+      watch:
+        - action: sync
+          path: ./services/user-service/src
+          target: /app/src
+        - action: rebuild
+          path: ./services/user-service/package.json
+
+  # task-service:
+  task-service:
+    build:
+      context: ./services/task-service
+      dockerfile: Dockerfile
+    container_name: task-service
+    ports:
+      - "4002:4002"       # Exposed for testing (remove after Gateway)
+    environment:
+      PORT: 4002
+      MONGO_URI: mongodb://mongo-task:27017/task_db
+      RABBITMQ_URL: amqp://admin:password@rabbitmq:5672
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+      mongo-task:
+        condition: service_started
+    networks:
+      - app-network
+    restart: unless-stopped
+    develop:
+      watch:
+        - action: sync
+          path: ./services/task-service/src
+          target: /app/src
+        - action: rebuild
+          path: ./services/task-service/package.json
+
+  # notification-service:
+  notification-service:
+    build:
+      context: ./services/notification-service
+      dockerfile: Dockerfile
+    container_name: notification-service
+    ports:
+      - "4003:4003"       # Exposed for testing (remove after Gateway)
+    environment:
+      PORT: 4003
+      MONGO_URI: mongodb://mongo-notification:27017/notification_db
+      RABBITMQ_URL: amqp://admin:password@rabbitmq:5672
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+      mongo-notification:
+        condition: service_started
+    networks:
+      - app-network
+    restart: unless-stopped
+    develop:
+      watch:
+        - action: sync
+          path: ./services/notification-service/src
+          target: /app/src
+        - action: rebuild
+          path: ./services/notification-service/package.json
+
+  # api-gateway:
+  api-gateway:
+    build:
+      context: ./services/api-gateway
+      dockerfile: Dockerfile
+    container_name: api-gateway
+    ports:
+      - "4000:4000"       # The ONLY port the frontend talks to
+    environment:
+      PORT: 4000
+      SECRET_KEY: ${SECRET_KEY}
+      USER_SERVICE_URL: http://user-service:4001
+      TASK_SERVICE_URL: http://task-service:4002
+      NOTIFICATION_SERVICE_URL: http://notification-service:4003
+      ALLOWED_ORIGINS: http://localhost:5173
+    depends_on:
+      - user-service
+      - task-service
+      - notification-service
+    networks:
+      - app-network
+    restart: unless-stopped
+    develop:
+      watch:
+        - action: sync
+          path: ./services/api-gateway/src
+          target: /app/src
+        - action: rebuild
+          path: ./services/api-gateway/package.json
+
+
+# ─── Shared Network ───────────────────────────────────────
+networks:
+  app-network:
+    driver: bridge
+
+# ─── Persistent Volumes ──────────────────────────────────
+volumes:
+  rabbitmq-data:
+  mongo-user-data:
+  mongo-task-data:
+  mongo-notif-data:

@@ -28,19 +28,25 @@ const GlobalState = ({children}) => {
         const verifyUserCookie = async () => {
         const data = await callUserAuthApi();
 
-        console.log(data, "verifyUserCookie");
-
         if (data?.userInfo) {
             setUser(data?.userInfo);
         }
 
-        return data?.success
-            ? navigate(
-                location.pathname === "/auth" || location.pathname === "/"
-                ? "/tasks/list"
-                : `${location.pathname}`
-            )
-            : navigate("/auth");
+        // Don't redirect if user is on the homepage "/"
+        if (location.pathname === "/") return;
+
+        if (data?.success) {
+            // Logged in user on /auth → send to tasks
+            if (location.pathname === "/auth") {
+                navigate("/tasks/list");
+            }
+            // Otherwise stay on current page
+        } else {
+            // Not logged in and trying to access protected route → send to auth
+            if (location.pathname !== "/auth") {
+                navigate("/auth");
+            }
+        }
         };
 
         verifyUserCookie();
