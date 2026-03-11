@@ -65,6 +65,18 @@ app.get('/health', (req, res) => {
   });
 });
 
+// Cron Job for Render Deployment
+let url = process.env.HEALTH_URL;
+const interval = 390000;
+function reloadWebsite(){
+  axios
+  .get(url)
+  .then(response => console.log('Website reloaded successfully'))
+  .catch(error => console.error('Failed to reload website:', error));
+}
+
+setInterval(reloadWebsite, interval);
+
 // ─── Proxy Setup ───────────────────────────────────────────────
 // Must come AFTER auth middleware so JWT is verified before proxying
 setupProxies(app);
