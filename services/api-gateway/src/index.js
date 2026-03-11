@@ -25,12 +25,12 @@ app.use(cors({
 }));
 
 // 2. Explicitly handle preflight OPTIONS (before proxy intercepts them)
-app.options('*', cors({
-  origin: allowedOrigins,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-  credentials: true,
-  allowedHeaders: ['Content-Type', 'Authorization', 'X-User-Id']
-}));
+app.use((req, res, next) => {
+  if (req.method === 'OPTIONS') {
+    return res.sendStatus(204);  // CORS headers already set by cors() above
+  }
+  next();
+});
 
 // 2. Cookie parser — extract token from cookies
 app.use(cookieParser());
