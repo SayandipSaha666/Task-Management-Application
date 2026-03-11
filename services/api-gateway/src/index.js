@@ -66,7 +66,7 @@ app.get('/health', (req, res) => {
 });
 
 // Cron Job for Render Deployment
-let url = process.env.HEALTH_URL;
+let url = process.env?.HEALTH_URL;
 const interval = 390000;
 function reloadWebsite(){
   axios
