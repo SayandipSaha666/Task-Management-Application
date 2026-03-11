@@ -12,25 +12,35 @@ const app = express();
 const PORT = process.env.PORT || 4000;
 
 // ─── Allowed Origins ──────────────────────────────────────────
-const allowedOrigins = process.env.ALLOWED_ORIGINS?.split(',') || ['http://localhost:5173'];
+// Trim trailing slashes — browser sends "https://example.com" (no slash)
+// but users often paste "https://example.com/" — CORS does exact matching!
+const allowedOrigins = (process.env.ALLOWED_ORIGINS?.split(',') || ['http://localhost:5173'])
+  .map(origin => origin.trim().replace(/\/+$/, ''));
 console.log('✅ CORS allowed origins:', allowedOrigins);
 
 // ─── Middleware (order matters!) ───────────────────────────────
-// 1. CORS first — handle preflight requests
-app.use(cors({
-  origin: allowedOrigins,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-  credentials: true,           // ← CRITICAL: allows cookies to be sent
-  allowedHeaders: ['Content-Type', 'Authorization', 'X-User-Id']
-}));
-
-// 2. Explicitly handle preflight OPTIONS (before proxy intercepts them)
+// 1. Manual CORS headers on EVERY response (including proxy errors)
 app.use((req, res, next) => {
+  const origin = req.headers.origin;
+  if (allowedOrigins.includes(origin)) {
+    res.setHeader('Access-Control-Allow-Origin', origin);
+    res.setHeader('Access-Control-Allow-Credentials', 'true');
+    res.setHeader('Access-Control-Allow-Methods', 'GET,POST,PUT,DELETE,PATCH,OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type,Authorization,X-User-Id');
+  }
   if (req.method === 'OPTIONS') {
-    return res.sendStatus(204);  // CORS headers already set by cors() above
+    return res.sendStatus(204);
   }
   next();
 });
+
+// 2. CORS middleware (belt-and-suspenders — works alongside manual headers)
+app.use(cors({
+  origin: allowedOrigins,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+  credentials: true,
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-User-Id']
+}));
 
 // 2. Cookie parser — extract token from cookies
 app.use(cookieParser());
