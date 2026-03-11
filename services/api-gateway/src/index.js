@@ -11,12 +11,25 @@ const setupProxies = require('./config/proxy');
 const app = express();
 const PORT = process.env.PORT || 4000;
 
+// ─── Allowed Origins ──────────────────────────────────────────
+const allowedOrigins = process.env.ALLOWED_ORIGINS?.split(',') || ['http://localhost:5173'];
+console.log('✅ CORS allowed origins:', allowedOrigins);
+
 // ─── Middleware (order matters!) ───────────────────────────────
 // 1. CORS first — handle preflight requests
 app.use(cors({
-  origin: process.env.ALLOWED_ORIGINS?.split(',') || ['http://localhost:5173'],
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
-  credentials: true           // ← CRITICAL: allows cookies to be sent
+  origin: allowedOrigins,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+  credentials: true,           // ← CRITICAL: allows cookies to be sent
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-User-Id']
+}));
+
+// 2. Explicitly handle preflight OPTIONS (before proxy intercepts them)
+app.options('*', cors({
+  origin: allowedOrigins,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+  credentials: true,
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-User-Id']
 }));
 
 // 2. Cookie parser — extract token from cookies
