@@ -49,7 +49,9 @@ const registerUser = async (req, res) => {
     const token = generateToken(newUser._id);
     res.cookie('token', token, {
       httpOnly: true,
-      sameSite: 'lax'
+      secure: process.env.NODE_ENV === 'production',      // HTTPS only in prod
+      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',  // Cross-origin in prod
+      maxAge: 24 * 60 * 60 * 1000    // 24 hours
     });
 
     // Publish event to RabbitMQ
@@ -170,7 +172,8 @@ const userAuthVerification = async (req, res) => {
 const logoutUser = async (req, res) => {
   res.clearCookie('token', {
     httpOnly: true,
-    sameSite: 'lax'
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax'
   });
 
   // Publish event to RabbitMQ 

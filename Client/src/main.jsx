@@ -5,11 +5,13 @@ import App from './App.jsx'
 import { BrowserRouter } from 'react-router-dom'
 import {Toaster} from 'sonner'
 import GlobalState from './context/Store.jsx'
+import { Analytics } from "@vercel/analytics/react";
 
 createRoot(document.getElementById('root')).render(
   <BrowserRouter>
     <GlobalState>
       <App />
+      <Analytics />
       <Toaster richColors position="top-right" />
     </GlobalState>
   </BrowserRouter>,
