@@ -4,6 +4,15 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { publishUserEvent } = require('../events/publisher');
 
+// ─── Shared cookie settings for all auth operations ────────────
+const getCookieConfig = () => ({
+  httpOnly: true,
+  secure: process.env.NODE_ENV === 'production',
+  sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+  maxAge: 24 * 60 * 60 * 1000,    // 24 hours
+  partitioned: process.env.NODE_ENV === 'production'  // Chrome CHIPS support
+});
+
 // ─── Validation Schemas (unchanged from monolith) ──────────────
 const registerSchema = Joi.object({
   name: Joi.string().required(),
@@ -47,12 +56,7 @@ const registerUser = async (req, res) => {
     await newUser.save();
 
     const token = generateToken(newUser._id);
-    res.cookie('token', token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',      // HTTPS only in prod
-      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',  // Cross-origin in prod
-      maxAge: 24 * 60 * 60 * 1000    // 24 hours
-    });
+    res.cookie('token', token, getCookieConfig());
 
     // Publish event to RabbitMQ
     await publishUserEvent('user.registered', {
@@ -106,10 +110,7 @@ const loginUser = async (req, res) => {
     }
 
     const token = generateToken(getUser._id);
-    res.cookie('token', token, {
-      httpOnly: true,
-      sameSite: 'lax'
-    });
+    res.cookie('token', token, getCookieConfig());
 
     // Publish event to RabbitMQ
     await publishUserEvent('user.loggedIn', {
@@ -170,11 +171,7 @@ const userAuthVerification = async (req, res) => {
 
 // ─── Logout ────────────────────────────────────────────────────
 const logoutUser = async (req, res) => {
-  res.clearCookie('token', {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
-    sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax'
-  });
+  res.clearCookie('token', getCookieConfig());
 
   // Publish event to RabbitMQ 
   await publishUserEvent('user.loggedOut', {
