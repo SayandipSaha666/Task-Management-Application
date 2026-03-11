@@ -36,7 +36,7 @@ function reloadWebsite(){
   .catch(error => console.error('Failed to reload website:', error));
 }
 
-setInterval(reloadWebsite, interval);
+// setInterval(reloadWebsite, interval);
 
 // ─── Routes ────────────────────────────────────────────────────
 app.use('/', notificationRoutes);

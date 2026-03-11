@@ -75,7 +75,7 @@ function reloadWebsite(){
   .catch(error => console.error('Failed to reload website:', error));
 }
 
-setInterval(reloadWebsite, interval);
+// setInterval(reloadWebsite, interval);
 
 // ─── Proxy Setup ───────────────────────────────────────────────
 // Must come AFTER auth middleware so JWT is verified before proxying
