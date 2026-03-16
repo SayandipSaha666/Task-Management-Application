@@ -32,11 +32,11 @@ const interval = 330000;
 function reloadWebsite(){
   axios
   .get(url)
-  .then(response => console.log('Website reloaded successfully'))
+  .then(response => console.log('task-service Cron job working...'))
   .catch(error => console.error('Failed to reload website:', error));
 }
 
-// setInterval(reloadWebsite, interval);
+setInterval(reloadWebsite, interval);
 
 // ─── Routes ────────────────────────────────────────────────────
 app.use('/', taskRoutes);
