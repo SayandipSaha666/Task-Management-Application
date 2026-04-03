@@ -1,4 +1,4 @@
-/*
+
 // ----------------------------- Monolith Architecture--------------------------------
 
 
@@ -63,10 +63,11 @@ export const updateTaskAPI = async(formData) => {
     return response?.data
 }
 
-*/
+
 
 // ---------------------------- Microservice Architecture ----------------------------------------
 
+/*
 import axios from "axios";
 
 // ─── Single source of truth for the API URL ────────────────────
@@ -166,3 +167,4 @@ export const markAllNotificationsReadAPI = async (userId) => {
   );
   return response?.data;
 };
+*/

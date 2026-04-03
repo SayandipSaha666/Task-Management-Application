@@ -37,7 +37,7 @@ function SignIn() {
       setLoggedInData(data);
       formData.reset(); 
     } catch (error) {
-      console.error('Signup failed:', error?.response?.data || error.message);
+      console.error('SignIn failed:', error?.response?.data || error.message);
     }
   }
 
