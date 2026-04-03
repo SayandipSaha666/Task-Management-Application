@@ -46,7 +46,8 @@ const registerUser = async( req,res,next) => {
                 const token = generateToken(newUser._id) // _id from mongodb
                 res.cookie('token',token,{
                     httpOnly: true,
-                    sameSite: 'lax'
+                    secure: true,
+                    sameSite: 'none'
                 })
                 res.status(201).json({
                     success: true,message: "User registered successfully",
@@ -91,7 +92,8 @@ const loginUser = async(req,res,next) => {
         const token = generateToken(getUser?._id)
         res.cookie('token',token,{
             httpOnly: true,
-            sameSite: 'lax'
+            secure: true,
+            sameSite: 'none'
         })
         res.status(201).json({
             success: true,message: "User logged in successfully",
@@ -113,7 +115,8 @@ const loginUser = async(req,res,next) => {
 const logoutUser = async(req,res,next) => {
     res.clearCookie('token', {
         httpOnly: true,
-        sameSite: 'lax'
+        secure: true,
+        sameSite: 'none'
     })
 
     return res.status(200).json({

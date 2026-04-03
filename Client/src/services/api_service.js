@@ -2,7 +2,7 @@
 // ----------------------------- Monolith Architecture--------------------------------
 
 import axios from "axios"
-const API_BASE_URL = import.meta.env.VITE_API_URL || `http://localhost:${process.env.PORT}`;
+const API_BASE_URL = import.meta.env.VITE_API_URL || `http://localhost:${import.meta.env.VITE_API_PORT}`;
 export const callRegisterUserApi = async (data) => {
     const response = await axios.post(`${API_BASE_URL}/api/user/register`, data, {
         withCredentials: true
