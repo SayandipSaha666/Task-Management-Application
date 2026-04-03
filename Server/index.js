@@ -5,8 +5,11 @@ const cors = require('cors')
 const cookieParser = require('cookie-parser')
 const bodyParser = require('body-parser')
 
+const allowedOrigins = process.env.ALLOWED_ORIGINS
+  ? process.env.ALLOWED_ORIGINS.split(',').map(o => o.trim())
+  : [];
 app.use(cors({
-    origin: ['http://localhost:5173'],
+    origin: allowedOrigins,
     methods: ['GET','POST','PUT','DELETE'],
     credentials: true
 }))
