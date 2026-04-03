@@ -1,23 +1,23 @@
 
 // ----------------------------- Monolith Architecture--------------------------------
 
-
 import axios from "axios"
+const API_BASE_URL = import.meta.env.VITE_API_URL || `http://localhost:${process.env.PORT}`;
 export const callRegisterUserApi = async (data) => {
-    const response = await axios.post("http://localhost:5000/api/user/register", data, {
+    const response = await axios.post(`${API_BASE_URL}/api/user/register`, data, {
         withCredentials: true
     })
     return response?.data
 }
 export const callLoginUserApi = async (data) => {
-    const response = await axios.post("http://localhost:5000/api/user/login", data, {
+    const response = await axios.post(`${API_BASE_URL}/api/user/login`, data, {
         withCredentials: true
     })
     return response?.data
 }
 export const callUserAuthApi = async () => {
     try {
-        const response = await axios.post("http://localhost:5000/api/user/auth", {}, {
+        const response = await axios.post(`${API_BASE_URL}/api/user/auth`, {}, {
             withCredentials: true
         })
         return response?.data
@@ -29,35 +29,35 @@ export const callUserAuthApi = async () => {
     }
 }
 export const callLogoutUserApi = async () => {
-    const response = await axios.post("http://localhost:5000/api/user/logout", {}, {
+    const response = await axios.post(`${API_BASE_URL}/api/user/logout`, {}, {
         withCredentials: true
     })
     return response?.data
 }
 
 export const addNewTaskAPI = async(formData) => {
-    const response = await axios.post("http://localhost:5000/api/task/add",formData, {
+    const response = await axios.post(`${API_BASE_URL}/api/task/add`,formData, {
         withCredentials: true
     });
     return response?.data
 } 
 
 export const getAllTaskAPI = async(id) => {
-    const response = await axios.get(`http://localhost:5000/api/task/all/${id}`, {
+    const response = await axios.get(`${API_BASE_URL}/api/task/all/${id}`, {
         withCredentials: true
     })
     return response?.data // getting from controller/getAllTasks
 }
 
 export const deleteTaskAPI = async(id) => {
-    const response = await axios.delete(`http://localhost:5000/api/task/delete/${id}`, {},{
+    const response = await axios.delete(`${API_BASE_URL}/api/task/delete/${id}`, {},{
         withCredentials: true
     })
     return response?.data
 }
 
 export const updateTaskAPI = async(formData) => {
-    const response = await axios.put("http://localhost:5000/api/task/update", formData, {
+    const response = await axios.put(`${API_BASE_URL}/api/task/update`, formData, {
         withCredentials: true
     })
     return response?.data
